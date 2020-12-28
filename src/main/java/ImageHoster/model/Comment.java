@@ -1,40 +1,38 @@
 package ImageHoster.model;
 
+import org.springframework.boot.autoconfigure.web.ResourceProperties;
+
 import javax.persistence.*;
 import java.util.Date;
-
 @Entity
-@Table (name = "comment")
+@Table(name="comments")
 public class Comment {
-
-    @Id
+    @Id()
+    @Column(name="id")
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column (name = "id")
-    private Integer id;
-
-    @Column (name = "text",length=256)
-    private String text;
-
-    @Column (name = "createdDate")
-    private Date createdDate;
-
+    private  Integer id;
     @ManyToOne(fetch = FetchType.EAGER)
-    //Below annotation indicates that the name of the column in 'images' table referring the primary key in 'users' table will be 'user_id'
-    @JoinColumn(name = "user_id")
     private User user;
-
+    @Column(name="text",columnDefinition = "TEXT")
+    private String text;
+    @Column(name="createdDate")
+    private Date createdDate;
     @ManyToOne(fetch = FetchType.EAGER)
-    //Below annotation indicates that the name of the column in 'images' table referring the primary key in 'users' table will be 'user_id'
-    @JoinColumn(name = "image_id")
     private Image image;
-
-
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getText() {
@@ -53,14 +51,6 @@ public class Comment {
         this.createdDate = createdDate;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     public Image getImage() {
         return image;
     }
@@ -68,4 +58,6 @@ public class Comment {
     public void setImage(Image image) {
         this.image = image;
     }
+
+
 }

@@ -2,49 +2,38 @@ package ImageHoster.controller;
 
 import ImageHoster.model.Comment;
 import ImageHoster.model.Image;
-import ImageHoster.model.Tag;
 import ImageHoster.model.User;
 import ImageHoster.service.CommentService;
 import ImageHoster.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.*;
+import java.util.Date;
 
 @Controller
 public class CommentController {
 
     @Autowired
+    private CommentService commentService;
+    @Autowired
     private ImageService imageService;
 
-    @Autowired
-    private ImageController imageController;
 
-    @Autowired
-    private CommentService commentService;
-
-    @RequestMapping(value = "/image/{imageId}/{imageTitle}/comments", method = RequestMethod.POST)
-    public String addComment(@PathVariable("imageId") Integer imageId,@PathVariable("imageTitle") String imageTitle,@RequestParam(name="comment") String comment,Comment newComment,HttpSession session) throws IOException {
-        User user = (User) session.getAttribute("loggeduser");
+    @RequestMapping(value="/image/{imageId}/{title}/comments", method = RequestMethod.POST)
+    public String newComment(@PathVariable("imageId") Integer imageId, @PathVariable("title") String title, Model model, @RequestParam("comment") String commentText, HttpSession session, Comment newComment) {
+        Image image = imageService.getImage(imageId);
+        User user= (User) session.getAttribute("loggeduser");
+        newComment.setText(commentText);
         newComment.setUser(user);
-        newComment.setImage(imageService.getImageById(imageId));
-        newComment.setText(comment);
+        newComment.setImage(image);
         newComment.setCreatedDate(new Date());
-        commentService.addComment(newComment);
-
-        return "redirect:/images/{imageId}/{imageTitle}";
+        commentService.createComment(newComment);
+        return "redirect:/images/"+imageId+"/"+title;
     }
-
-    @RequestMapping("comments/{imageId}")
-    public String getUserComments(@PathVariable("imageId") Integer imageId,Model model) {
-        List<Comment> comment = commentService.getComment(imageId);
-        model.addAttribute("comments", comment);
-        return "comments";
-    }
-
 }

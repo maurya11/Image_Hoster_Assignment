@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.regex.Pattern;
 
 
 @Controller
@@ -23,7 +24,6 @@ public class UserController {
 
     @Autowired
     private ImageService imageService;
-
     //This controller method is called when the request pattern is of type 'users/registration'
     //This method declares User type and UserProfile type object
     //Sets the user profile with UserProfile type object
@@ -40,23 +40,20 @@ public class UserController {
     //This controller method is called when the request pattern is of type 'users/registration' and also the incoming request is of POST type
     //This method calls the business logic and after the user record is persisted in the database, directs to login page
     @RequestMapping(value = "users/registration", method = RequestMethod.POST)
-    public String registerUser(User user, Model  model) {
-
-        String password =user.getPassword();
-
-        if (((password.matches("(?=.*[a-z]).*")||(password.matches("(?=.*[A-Z]).*"))) && password.matches("(?=.*[0-9]).*")) && password.matches("(?=.*[~!@#$%^&*()_-]).*")) {
+    public String registerUser(User user,Model model) {
+        String password= user.getPassword();
+        String pattern = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@#$%^&+=]).{3,}";
+        String error="Password must contain atleast 1 alphabet, 1 number & 1 special character";
+         boolean isValidPassword= Pattern.matches(pattern,password);
+        if(isValidPassword){
             userService.registerUser(user);
-            return "redirect:/users/login";
-        }
-        else{
-            String error = "Password must contain atleast 1 alphabet, 1 number & 1 special character";
+            return "users/login";
+        }else{
             model.addAttribute("passwordTypeError",error);
-
-            User user1 = new User();
+            User newUser = new User();
             UserProfile profile = new UserProfile();
-            user1.setProfile(profile);
-            model.addAttribute("User", user1);
-
+            newUser.setProfile(profile);
+            model.addAttribute("User", newUser);
             return "users/registration";
         }
 

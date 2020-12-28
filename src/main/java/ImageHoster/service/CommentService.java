@@ -7,18 +7,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
 @Service
 public class CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public void addComment(Comment comment) { commentRepository.addComment(comment); }
-
-    public List<Comment> getComment(Integer imageId) {
-        return commentRepository.getComment(imageId);
+    public List<Comment> getAllCommentsByImage(Integer imageId) {
+        return commentRepository.getAllComments(imageId);
     }
 
+    public Comment createComment(Comment comment) {
+        return commentRepository.createComment(comment);
+    }
 }
-
-
-
